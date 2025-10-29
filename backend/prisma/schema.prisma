@@ -1,0 +1,239 @@
+// This is your Prisma schema file for TripSkip - Direct Booking Platform
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/prisma"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================================================
+// USER MANAGEMENT
+// ============================================================================
+
+// Host/Traveler user model
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  password          String
+  name              String
+  avatar            String?
+  phone             String?
+  bio               String?
+  userType          UserType @default(TRAVELER) // HOST or TRAVELER
+  isVerified        Boolean  @default(false)
+  verificationToken String?  @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  listings      Listing[]
+  savedListings SavedListing[]
+  hostProfile   HostProfile?
+
+  @@map("users")
+}
+
+enum UserType {
+  HOST
+  TRAVELER
+}
+
+// Extended profile for hosts
+model HostProfile {
+  id                 String             @id @default(cuid())
+  userId             String             @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName        String?
+  taxId              String?
+  bankAccount        String? // Encrypted
+  payoutEmail        String?
+  totalListings      Int                @default(0)
+  totalBookings      Int                @default(0)
+  averageRating      Float              @default(0)
+  responseTime       Int                @default(0) // in hours
+  acceptanceRate     Float              @default(100)
+  cancellationPolicy CancellationPolicy @default(FLEXIBLE)
+  certifications     String[] // URLs to certifications
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@map("host_profiles")
+}
+
+enum CancellationPolicy {
+  FLEXIBLE
+  MODERATE
+  STRICT
+}
+
+// ============================================================================
+// LISTINGS
+// ============================================================================
+
+// Main listing model for properties/accommodations
+model Listing {
+  id           String          @id @default(cuid())
+  hostId       String
+  host         User            @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  category     ListingCategory
+  propertyType PropertyType
+  location     String // Address or location name
+  latitude     Float?
+  longitude    Float?
+  city         String
+  state        String?
+  country      String
+  postalCode   String?
+
+  // Pricing
+  basePrice    Decimal
+  currency     String    @default("USD")
+  pricePerUnit PriceUnit @default(NIGHT)
+
+  // Capacity
+  maxGuests Int
+  bedrooms  Int
+  bathrooms Int
+  beds      Int
+
+  // Booking link (the core feature - direct booking)
+  directBookingUrl String
+  bookingPlatform  BookingPlatform?
+
+  // Details
+  amenities String[] // ["wifi", "kitchen", "parking", etc]
+  rules     String[]
+  languages String[]
+
+  // Status
+  isActive   Boolean @default(true)
+  isFeatured Boolean @default(false)
+  views      Int     @default(0)
+
+  // Media
+  images ListingImage[]
+
+  // Engagement
+  savedBy SavedListing[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([hostId])
+  @@index([city])
+  @@index([country])
+  @@map("listings")
+}
+
+enum ListingCategory {
+  APARTMENT
+  HOUSE
+  VILLA
+  CONDO
+  COTTAGE
+  CABIN
+  ROOM
+  HOTEL
+  RESORT
+  HOSTEL
+  BOAT
+  OTHER
+}
+
+enum PropertyType {
+  ENTIRE_PLACE
+  PRIVATE_ROOM
+  SHARED_ROOM
+}
+
+enum PriceUnit {
+  NIGHT
+  WEEK
+  MONTH
+  HOUR
+  PERSON_NIGHT
+}
+
+enum BookingPlatform {
+  AIRBNB
+  BOOKING_COM
+  VRBO
+  HOSTAWAY
+  AIRBNB_DIRECT
+  HOTEL_OWN_WEBSITE
+  OTHER
+}
+
+// Listing images/media
+model ListingImage {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+  @@map("listing_images")
+}
+
+// Saved listings (favorites/wishlist)
+model SavedListing {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  savedAt   DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@index([userId])
+  @@map("saved_listings")
+}
+
+// ============================================================================
+// ANALYTICS & SEO
+// ============================================================================
+
+// Track listing views for analytics
+model ListingView {
+  id        String  @id @default(cuid())
+  listingId String
+  userId    String?
+
+  visitorIp String?
+  userAgent String?
+  referer   String?
+
+  viewedAt DateTime @default(now())
+
+  @@index([listingId])
+  @@index([viewedAt])
+  @@map("listing_views")
+}
+
+// Search queries for SEO and trending data
+model SearchQuery {
+  id      String  @id @default(cuid())
+  query   String
+  city    String?
+  country String?
+
+  resultCount Int @default(0)
+
+  searchedAt DateTime @default(now())
+
+  @@index([query])
+  @@index([searchedAt])
+  @@map("search_queries")
+}

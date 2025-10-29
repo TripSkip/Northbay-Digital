@@ -1,0 +1,6 @@
+node_modules
+# Keep environment variables out of version control
+.env
+.env.local
+firebase-key.json
+tripskip-63a61-firebase-adminsdk-fbsvc-d4df784f5a.json

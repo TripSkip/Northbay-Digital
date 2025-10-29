@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+/* Base tokens (legacy) */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+/* New design tokens */
+:root {
+  --bg: #0F192C;               /* Navy 900 */
+  --surface: #13213A;          /* Navy 800 */
+  --text: #FFFFFF;             /* White */
+  --text-subtle: #90BFCB;      /* Sky 300 */
+  --primary: #2899BC;          /* Royal Blue 600 */
+  --primary-hover: #329FC1;    /* Royal Blue 500 */
+  --accent: #E78B34;           /* Orange 500 */
+  --accent-hover: #D05831;     /* Orange 600 */
+  --danger: #C8102E;           /* Red 500 */
+  --border: #9EB3C7;
+  --yellow-500: #FFC72C;
+  /* Convenience: semi-transparent border for surfaces (≈45%) */
+  --border-muted: rgba(158, 179, 199, 0.45);
+}
+
+/* Font vars mapping (kept) */
+:root {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Prefer dark palette by default as per spec */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--bg);
+    --foreground: var(--text);
+  }
+}
+
+/* Global base */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Poppins", Arial, Helvetica, sans-serif;
+}
+
+/* Poppins helper classes (optional) */
+.poppins-thin { font-family: "Poppins", sans-serif; font-weight: 100; font-style: normal; }
+.poppins-extralight { font-family: "Poppins", sans-serif; font-weight: 200; font-style: normal; }
+.poppins-light { font-family: "Poppins", sans-serif; font-weight: 300; font-style: normal; }
+.poppins-regular { font-family: "Poppins", sans-serif; font-weight: 400; font-style: normal; }
+.poppins-medium { font-family: "Poppins", sans-serif; font-weight: 500; font-style: normal; }
+.poppins-semibold { font-family: "Poppins", sans-serif; font-weight: 600; font-style: normal; }
+.poppins-bold { font-family: "Poppins", sans-serif; font-weight: 700; font-style: normal; }
+.poppins-extrabold { font-family: "Poppins", sans-serif; font-weight: 800; font-style: normal; }
+.poppins-black { font-family: "Poppins", sans-serif; font-weight: 900; font-style: normal; }
+.poppins-thin-italic { font-family: "Poppins", sans-serif; font-weight: 100; font-style: italic; }
+.poppins-extralight-italic { font-family: "Poppins", sans-serif; font-weight: 200; font-style: italic; }
+.poppins-light-italic { font-family: "Poppins", sans-serif; font-weight: 300; font-style: italic; }
+.poppins-regular-italic { font-family: "Poppins", sans-serif; font-weight: 400; font-style: italic; }
+.poppins-medium-italic { font-family: "Poppins", sans-serif; font-weight: 500; font-style: italic; }
+.poppins-semibold-italic { font-family: "Poppins", sans-serif; font-weight: 600; font-style: italic; }
+.poppins-bold-italic { font-family: "Poppins", sans-serif; font-weight: 700; font-style: italic; }
+.poppins-extrabold-italic { font-family: "Poppins", sans-serif; font-weight: 800; font-style: italic; }
+.poppins-black-italic { font-family: "Poppins", sans-serif; font-weight: 900; font-style: italic; }
+
+/* Utility classes for tokens */
+.bg-app { background-color: var(--bg); }
+.bg-surface { background-color: var(--surface); }
+.bg-primary { background-color: var(--primary); }
+.bg-primary-hover { background-color: var(--primary-hover); }
+.bg-accent { background-color: var(--accent); }
+.bg-accent-hover { background-color: var(--accent-hover); }
+.bg-danger { background-color: var(--danger); }
+
+.text-body { color: var(--text); }
+.text-subtle { color: var(--text-subtle); }
+.text-primary { color: var(--primary); }
+.text-accent { color: var(--accent); }
+.text-danger { color: var(--danger); }
+.text-yellow-token { color: var(--yellow-500); }
+
+.border-muted { border-color: var(--border-muted); }
+.border-strong { border-color: var(--border); }
+.border-accent { border-color: var(--accent); }
+
+/* Hover states */
+.hover\:bg-primary-hover:hover { background-color: var(--primary-hover); }
+.hover\:bg-accent-hover:hover { background-color: var(--accent-hover); }
+.hover\:text-primary-hover:hover { color: var(--primary-hover); }
+.hover\:text-accent-hover:hover { color: var(--accent-hover); }
+
+/* Circular icon badge used in segmented search and value props */
+.icon-circle {
+  /* enforce perfect circle regardless of padding/parent flex settings */
+  inline-size: 40px;           /* logical width */
+  block-size: 40px;            /* logical height */
+  aspect-ratio: 1 / 1;
+  border-radius: 9999px;
+  border: 1px solid var(--border-muted);
+  box-sizing: border-box;      /* include border/padding inside the box */
+  padding: 0;                  /* avoid accidental padding making ovals */
+  display: inline-grid;        /* easy centering without line-height issues */
+  place-items: center;
+  line-height: 0;              /* prevent inline height artifacts */
+  flex: 0 0 auto;              /* never stretch in flex parents */
+  color: var(--text-subtle);
+}
+
+/* Soft filled background for icon circles (used in value props) */
+.bg-badge { background-color: rgba(158, 179, 199, 0.18); }
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--text);
+}
+.btn-primary:hover { background-color: var(--primary-hover); }
+
+.btn-accent {
+  background-color: var(--accent);
+  color: var(--text);
+}
+.btn-accent:hover { background-color: var(--accent-hover); }
+
+/* Inputs */
+.focus-ring-primary:focus { outline: none; box-shadow: 0 0 0 2px var(--primary); }
+.placeholder-subtle::placeholder { color: var(--text-subtle); opacity: 1; }
+
+/* Animations */
+@keyframes slideInScale {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+}
+
+.animate-hover-scale {
+  transition: all 0.3s ease-in-out;
+}
+
+.animate-hover-scale:hover {
+  animation: slideInScale 0.3s ease-in-out forwards;
+}
+
+/* Full-bleed utility: make a section span the full viewport width,
+   even when inside a centered/narrow parent. Keeps content centering logic simple. */
+.full-bleed {
+  width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
