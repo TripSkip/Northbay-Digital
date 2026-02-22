@@ -14,6 +14,7 @@ const listingService = require('./services/listingService')
 const { router: authRouter, verifyToken } = require('./routes/auth')
 const usersRouter = require('./routes/users')
 const listingsRouter = require('./routes/listings')
+const channelsRouter = require('./routes/channels')
 
 const admin = require('firebase-admin')
 
@@ -76,6 +77,7 @@ app.use(express.json())
 app.use('/api/auth', authRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/listings', listingsRouter)
+app.use('/api/channels', channelsRouter)
 
 // Keep existing PostgreSQL connection for backward compatibility
 const pool = new Pool({
